@@ -9,5 +9,5 @@ function setup() {
 }
 
 function draw() {
-
+    display(board,wcell)  
 }
