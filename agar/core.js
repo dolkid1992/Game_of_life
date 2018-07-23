@@ -1,36 +1,34 @@
 const LIVING=1;
+const STILL_LIFES=2;
 function display(board, size) {
     for (i = 0; i < board.length; i++) {
         rows = board[i]
         for (j = 0; j < rows.length; j++) {
-            coloring(color(0, 0, 0), isLivingCell(rows[j]));
+            coloring(color(0, 255, 0), isLivingCell(rows[j]) );
             rect(j * size, i * size, size, size)
-            for (i = 0; i < board.length; i++) {
-                rows = board[i]
-                for (j = 0; j < rows.length; j++) {
-                    coloring(color(0, 255, 0), rows[j] == 1);
-                    rect(j * size, i * size, size, size)
-                }
-            }
         }
     }
 }
 
 function coloring(color, condition) {
-    if (condition) {
-        fill(color)
-    } else {
+    if (condition == LIVING) {
+        fill(0, 255, 0)
+    }
+    else if (condition == STILL_LIFES){
+        fill(0, 0, 255)
+    }
+    else {
         fill(255, 255, 255)
     }
 }
 
 function seeding(row,col,board) {
-    board[row][col]=LIVING
+    board[row][col]=LIVING;
     return board
 }
 
 function isLivingCell(value) {
-    return value==LIVING;
+    return value;
 }
 
 function create2DArray(rows, cols) {
@@ -53,6 +51,9 @@ function generate(board, columns, rows, next) {
             var neighbors = 0;
             for (var i = -1; i <= 1; i++) {
                 for (var j = -1; j <= 1; j++) {
+                    if (board[x + i][y + j] == 2){
+                        board[x + i][y + j] = 1;
+                    }
                     neighbors += board[x + i][y + j];
                 }
             }
@@ -64,7 +65,8 @@ function generate(board, columns, rows, next) {
             if ((board[x][y] == 1) && (neighbors < 2)) next[x][y] = 0;           // Loneliness
             else if ((board[x][y] == 1) && (neighbors > 3)) next[x][y] = 0;           // Overpopulation
             else if ((board[x][y] == 0) && (neighbors == 3)) next[x][y] = 1;           // Reproduction
-            else next[x][y] = board[x][y]; // Stasis
+            else if (board[x][y] == 1 && neighbors == 2 || neighbors ==3 ){
+                next[x][y] = STILL_LIFES;}  // Stasis
         }
     }
     var temp = board
