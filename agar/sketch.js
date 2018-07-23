@@ -4,6 +4,7 @@ var next;
 var rows;
 var cols;
 var check;
+var stopId;
 
 function setup() {
     createCanvas(640, 480)
@@ -11,18 +12,18 @@ function setup() {
     cols = floor(640 / wcell)
     board = create2DArray(rows, cols)
     next = createNext(rows,cols);
+    next = createNext(rows, cols);
     btnStart = createButton("Start")
     btnStart.position(10, 500)
     btnStart.mousePressed(onStart)
+    btnStop = createButton("Stop")
+    btnStop.position(90, 500)
+    btnStop.mousePressed(Stop)
     smooth()
 }
 
 function draw() {
     display(board, wcell)
-}
-
-function onStart() {
-    check = setInterval(() => generate(board, 480 / 20, 640 / 20, next), 500)
 }
 
 function mousePressed() {
@@ -32,5 +33,15 @@ function mousePressed() {
          var y = mouseY % 20 == 0 ? Math.ceil(mouseY / 20 - 1) : Math.ceil(mouseY / 20);
          seeding(y - 1, x - 1, board);
      }
+}
+
+function Stop() {
+    // clearTimeout(stopId);
+    clearInterval(stopId);
+}
+
+function onStart() {
+    stopId = setInterval(() => generate(board, 480 / 20, 640 / 20, next), 500);
+
 }
 
