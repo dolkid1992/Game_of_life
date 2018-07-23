@@ -22,16 +22,15 @@ function draw() {
 }
 
 function onStart() {
-    check = setInterval(() => generate(board, 480 / 20, 640 / 20, next), 500);
-
+    check = setInterval(() => generate(board, 480 / 20, 640 / 20, next), 500)
 }
-
 
 function mousePressed() {
-    if (mouseY <= 480) {
-        var pos = new Array();
-        var x = mouseX % 20 == 0 ? Math.ceil(mouseX / 20 - 1) : Math.ceil(mouseX / 20);
-        var y = mouseY % 20 == 0 ? Math.ceil(mouseY / 20 - 1) : Math.ceil(mouseY / 20);
-        seeding(y - 1, x - 1, board);
-    }
+     if (mouseY <= 480) {
+         var pos = new Array();
+         var x = mouseX % 20 == 0 ? Math.ceil(mouseX / 20 - 1) : Math.ceil(mouseX / 20);
+         var y = mouseY % 20 == 0 ? Math.ceil(mouseY / 20 - 1) : Math.ceil(mouseY / 20);
+         seeding(y - 1, x - 1, board);
+     }
 }
+
