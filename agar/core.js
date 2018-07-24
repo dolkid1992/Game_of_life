@@ -1,10 +1,9 @@
 const LIVING=1;
 const STILL_LIFES=2;
-function display(board, size) {
-    for (i = 0; i < board.length; i++) {
-        rows = board[i]
-        for (j = 0; j < rows.length; j++) {
-            coloring(color(0, 255, 0), isLivingCell(rows[j]) );
+function display(board, rows, columns, size) {
+    for (i = 0; i < rows; i++) {
+        for (j = 0; j < columns; j++) {
+            coloring(color(0, 255, 0), isLivingCell(board[i][j]) );
             rect(j * size, i * size, size, size)
         }
     }
@@ -32,9 +31,9 @@ function isLivingCell(value) {
 }
 
 function create2DArray(rows, cols) {
-    var f = new Array();
+    var f = new Array(rows);
     for (i = 0; i < rows; i++) {
-        f[i] = new Array();
+        f[i] = new Array(cols);
         for (j = 0; j < cols; j++) {
             f[i][j] = 0;
         }
@@ -43,53 +42,77 @@ function create2DArray(rows, cols) {
 }
 
 // The process of creating the new generation
-function generate(board, columns, rows, next) {
+function generate(board, rows, columns, next) {
+    resetColor(board, rows, columns)
     // Loop through every spot in our 2D array and check spots neighbors
-    for (var x = 1; x < columns - 1; x++) {
-        for (var y = 1; y < rows - 1; y++) {
+    for (var x = 1; x < rows - 1; x++) {
+        for (var y = 1; y < columns - 1; y++) {
             // Add up all the states in a 3x3 surrounding grid
             var neighbors = 0;
             for (var i = -1; i <= 1; i++) {
                 for (var j = -1; j <= 1; j++) {
-                    if (board[x + i][y + j] == 2){
-                        board[x + i][y + j] = 1;
-                    }
                     neighbors += board[x + i][y + j];
                 }
             }
 
-            // A little trick to subtract the current cell's state since
-            // we added it in the above loop
             neighbors -= board[x][y];
-            // Rules of Life
-            if ((board[x][y] == 1) && (neighbors < 2)) next[x][y] = 0;           // Loneliness
-            else if ((board[x][y] == 1) && (neighbors > 3)) next[x][y] = 0;           // Overpopulation
-            else if ((board[x][y] == 0) && (neighbors == 3)) next[x][y] = 1;           // Reproduction
-            else if (board[x][y] == 1 && neighbors == 2 || neighbors ==3 ){
-                next[x][y] = STILL_LIFES;}  // Stasis
+
+            if ((board[x][y] === 1) && (neighbors < 2)) next[x][y] = 0;
+            else if ((board[x][y] === 1) && (neighbors > 3)) next[x][y] = 0;
+            else if ((board[x][y] === 0) && (neighbors === 3)) next[x][y] = 1;
+            else {
+                if (next[x][y] != STILL_LIFES)
+                    next[x][y] = board[x][y];
+            }
+
+            checkStillLifeBlock(board, x, y, next);
         }
     }
-    var temp = board
-    for (let i = 0; i < rows; i++) {
-        for (let j = 0; j < columns; j++) {
+
+    //Assign current board to the next
+    for (var i = 0; i < rows; i++) {
+        for (var j = 0; j < columns; j++) {
             board[i][j] = next[i][j];
         }
     }
-    for (let i = 0; i < rows; i++) {
-        for (let j = 0; j < columns; j++) {
-            next[i][j] = temp[i][j];
+    //Reset next
+    reset(next, rows, columns)
+}
+
+function reset(arr, rows, columns) {
+    for (var x = 0; x < rows - 1; x++) {
+        for (var y = 0; y < columns - 1; y++) {
+            arr[x][y] = 0;
         }
     }
 }
 
-function createNext(rows, cols) {
-    var next = new Array(rows);
-    for (let i = 0; i < rows; i++) {
-        next[i] = new Array(cols);
-        for (let j = 0; j < cols; j++) {
-            next[i][j] = 0;
+function resetColor(arr, rows, columns) {
+    for (var x = 0; x < rows - 1; x++) {
+        for (var y = 0; y < columns - 1; y++) {
+            if (arr[x][y] > 1)
+                arr[x][y] = 1;
         }
     }
-    return next;
 }
+
+function checkStillLifeBlock(board, x, y, next) {
+    var checkBlock = false;
+    var checkBoderBlock = false;
+    if(board[x][y] === 1) {
+        checkBlock = (board[x + 1][y + 0] === 1) && (board[x + 0][y + 1] === 1) && (board[x + 1][y + 1] === 1) && (board[x + 0][y + 0] === 1);
+        checkBoderBlock = (board[x - 1][y - 1] === 0) && (board[x + 0][y - 1] === 0) && (board[x + 1][y - 1] === 0)
+            && (board[x + 2][y - 1] === 0) && (board[x - 1][y + 0] === 0) && (board[x + 2][y + 0] === 0)
+            && (board[x - 1][y + 1] === 0) && (board[x + 2][y + 1] === 0) && (board[x - 1][y + 2] === 0)
+            && (board[x + 0][y + 2] === 0) && (board[x + 1][y + 2] === 0) && (board[x + 2][y + 2] === 0)
+    }
+
+    if (checkBlock && checkBoderBlock) {
+        next[x + 0][y + 0] = STILL_LIFES
+        next[x + 0][y + 1] = STILL_LIFES
+        next[x + 1][y + 0] = STILL_LIFES
+        next[x + 1][y + 1] = STILL_LIFES
+    }
+}
+
 
