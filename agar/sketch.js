@@ -7,7 +7,7 @@ var check;
 var stopId;
 
 function setup() {
-    createCanvas(640, 480)
+    createCanvas(640, 480) // x,y
     rows = Math.floor(480 / wcell)
     cols = Math.floor(640 / wcell)
     board = create2DArray(rows, cols)
